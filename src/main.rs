@@ -1,10 +1,10 @@
 mod color_list;
 use std::env;
-//use std::fmt::Write;
 use std::collections::HashSet;
 use std::ffi::OsStr;
 use std::fs;
 use std::path::Path;
+use color_list::ColorList;
 
 fn get_extension(filename: &str) -> Option<&str> {
     Path::new(filename).extension().and_then(OsStr::to_str)
@@ -12,7 +12,8 @@ fn get_extension(filename: &str) -> Option<&str> {
 
 fn parse_path(path: &str) -> Vec<String> {
     let mut files = vec![];
-    let md = fs::metadata(path).unwrap();
+    let md = fs::metadata(path)
+            .expect(&format!("Error finding path {}.",path));
     
     //TODO: FIND BETTER WAY TO CHECK VALID EXTENSIONS
     let mut valid_extensions = HashSet::new();
@@ -59,9 +60,7 @@ fn main() {
     let files = parse_path(path);
     println!("{:?}", files);
 
-    let mut rgb_list = color_list::ColorList {
-        colors_set: HashSet::new(),
-    };
+    let mut rgb_list = ColorList::new();
 
     for filename in files {
         rgb_list.add_file(String::from(filename));

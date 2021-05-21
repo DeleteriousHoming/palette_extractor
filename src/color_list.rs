@@ -1,16 +1,22 @@
 /*This module is for storing a set of rgbs */
-
 mod rgb;
 use std::collections::HashSet;
 use std::fmt::Write;
-
+use std::iter::FromIterator;
 
 #[derive(Debug)]
 pub struct ColorList {
-    pub colors_set: HashSet<rgb::Rgb>,
+    colors_set: HashSet<rgb::Rgb>,
+    //colors_vec: Vec<rgb::Rgb>,
 }
 
 impl ColorList {
+    pub fn new() -> ColorList {
+        ColorList {
+            colors_set: HashSet::new(),
+            //colors_vec: Vec::new(),
+        }
+    }
 
     //Receives a filename and adds all of the image's colors to the hash set
     pub fn add_file(&mut self, filename: String) -> () {
@@ -29,32 +35,38 @@ impl ColorList {
 
             //Every third value we create a new Rgb item and add it to the hash
             if i == 3 {
-                self.colors_set.insert(rgb::Rgb {
-                    r: rgb_arr[0],
-                    g: rgb_arr[1],
-                    b: rgb_arr[2],
-                });
+                self.colors_set.insert(rgb::Rgb::new(
+                    rgb_arr[0],
+                    rgb_arr[1],
+                    rgb_arr[2]
+                ));
                 i = 0;
             }
         }
     }
 
-    /*Transorms the current hash set into a gpl format and returns the gpl string 
-    name is the name that the palette will be given*/
+    /*Transorms the current hash set into a gpl format and returns the gpl string
+    --name is the name that the palette will be given*/
 
-    pub fn to_gpl(&mut self, name : String) -> String{
-        let columns = self.colors_set.len();
+    pub fn to_gpl(&mut self, name: String) -> String {
+        let colors_len = self.colors_set.len();
+        let set_clone = self.colors_set.clone();
+        let mut vec = Vec::from_iter(set_clone.into_iter());
+        vec.sort_by(|a,b| a.h.partial_cmp(&b.h).unwrap());
+
         let mut gpl = String::from("");
-        write!(gpl, "GIMP Palette\nName: {}\nColumns: {}\n" ,name,columns)
+        write!(
+            gpl,
+            "GIMP Palette\nName: {}\n#Colors: {}\n",
+            name, colors_len
+        )
         .expect("Error in converting color list into gpl format");
 
-        for (i,rgb) in self.colors_set.iter().enumerate() {
-            write!(gpl,"{}\t{}\t{}\t#{}\n", rgb.r,rgb.g,rgb.b,i).
-            expect("Could note create gpl line during color_list to_gpl conversion.");
+        for (i, rgb) in vec.iter().enumerate() {
+            write!(gpl, "{}\t{}\t{}\t#{}\n", rgb.r, rgb.g, rgb.b, i)
+                .expect("Could note create gpl line during color_list to_gpl conversion.");
         }
 
         return gpl;
-
-
     }
 }
