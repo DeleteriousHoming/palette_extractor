@@ -52,7 +52,7 @@ impl ColorList {
         let colors_len = self.colors_set.len();
         let set_clone = self.colors_set.clone();
         let mut vec = Vec::from_iter(set_clone.into_iter());
-        vec.sort_by(|a,b| a.h.partial_cmp(&b.h).unwrap());
+        vec.sort_by(|a,b| a.sort_key.cmp(&b.sort_key));
 
         let mut gpl = String::from("");
         write!(

@@ -7,7 +7,7 @@ pub struct Rgb {
     pub b: u8,
 
     pub h: f64,
-    pub s: f64,
+    /*pub s: f64,*/
     pub v: f64,
 
     //A combination of hsv that yields a key upon which
@@ -48,7 +48,7 @@ impl Rgb {
          g : u8,
          b : u8,
          h : f64,
-         s : f64,
+         //s : f64,
          v : f64, 
          repetitions : u8) -> (u32,u32,u32) {
 
@@ -64,26 +64,27 @@ impl Rgb {
     }
 
     pub fn new(r: u8, g: u8, b: u8) -> Rgb {
-        let (h,s,v) = Rgb::calculate_hsv(r, g, b);
-        let key = Rgb::step(r, g, b, h, s, v, 8);
+        let (h,v) = Rgb::calculate_hv(r, g, b);
+        let key = Rgb::step(r, g, b, h, /*s,*/ v, 8);
         Rgb {
             r: r,
             g: g,
             b: b,
 
             h: h,
-            s: s,
+            /*s: s,*/
             v: v,
             sort_key: key,
         }
     }
 
-    pub fn calculate_hsv(r: u8, g: u8, b: u8) -> (f64,f64,f64) {
+    /*Calculates hue and value given rgb, saturation is not needed */
+    pub fn calculate_hv(r: u8, g: u8, b: u8) -> (f64,f64) {
         let rp = r as f64 / 255.0;
         let gp = g as f64 / 255.0;
         let bp = b as f64 / 255.0;
         let mut hue: f64 = 0.0;
-        let s: f64;
+        //let s: f64;
         let v: f64;
 
         let cmax = rp.max(gp.max(bp)); //Maximum value out of r,g,b
@@ -100,14 +101,15 @@ impl Rgb {
             hue = Rgb::hue_formula(rp, gp, delta, 240.0);
         }
 
+        /*
         if cmax == 0.0 {
             s = 0.0;
         } else {
             s = (delta / cmax) * 100.0;
-        }
+        }*/
 
         v = cmax * 100.0;
 
-        (hue,s,v)
+        (hue /*,s*/ ,v)
     }
 }
